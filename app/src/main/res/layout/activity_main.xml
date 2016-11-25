@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_main_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/coach_marks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/coach_marks_status_bar"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/block_mult_touch_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/progress_init_app"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.7"
+        android:background="@android:color/black"
+        android:clickable="true">
+
+        <ProgressBar
+            android:id="@+id/progress_main"
+            android:layout_width="50px"
+            android:layout_height="50px"
+            android:layout_centerInParent="true"
+            android:indeterminate="true" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_progress_main_with_text"
+        android:layout_width="600px"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="95px"
+        android:layout_marginRight="95px"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        android:alpha="1"
+        android:padding="40px">
+
+        <ProgressBar
+            android:id="@+id/progress_main_with_text"
+            android:layout_width="50px"
+            android:layout_height="50px"
+            android:layout_marginRight="20px"
+            android:layout_centerVertical="true"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/txt_progress_main_with_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/progress_main_with_text"
+            android:text="texto"
+            android:textColor="@color/gray_txt_standard"
+            android:textSize="@dimen/text_30dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

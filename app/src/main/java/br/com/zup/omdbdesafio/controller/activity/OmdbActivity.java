@@ -1,0 +1,84 @@
+package br.com.zup.omdbdesafio.controller.activity;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
+import br.com.zup.omdbdesafio.R;
+import br.com.zup.omdbdesafio.view.Frags;
+import br.com.zup.omdbdesafio.view.fragment.DetailFragment;
+import br.com.zup.omdbdesafio.view.fragment.MainFragment;
+import br.com.zup.omdbdesafio.view.fragment.RegisterFragment;
+
+
+public class OmdbActivity extends AbstractFragmentActivity {
+
+    private transient View viewLoadingText;
+    private transient View viewLoading;
+    private transient TextView textLoading;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+       Log.e("OmdbActivity", getClass().getName());
+
+        setContentView(R.layout.activity_main);
+
+        this.viewLoading = findViewById(R.id.progress_init_app);
+        this.viewLoadingText = findViewById(R.id.rl_progress_main_with_text);
+        this.textLoading = (TextView) viewLoadingText.findViewById(R.id.txt_progress_main_with_text);
+
+        viewLoading.setVisibility(View.GONE);
+
+        showMainScreen();
+
+    }
+
+    @Override
+    public void showDetail() {
+        DetailFragment fragment = (DetailFragment) registerFragment(Frags.DETAIL);
+        replaceFragment(Frags.DETAIL,true);
+    }
+
+    @Override
+    public void showMainScreen() {
+        if (fragMan.getBackStackEntryCount() > 0) {
+            popBackStackStart();
+        }
+        MainFragment fragment = (MainFragment) registerFragment(Frags.MAIN);
+        replaceFragment(Frags.MAIN, false);
+    }
+
+    @Override
+    public void showRegister() {
+        RegisterFragment fragment = (RegisterFragment) registerFragment(Frags.REGISTER);
+        replaceFragment(Frags.REGISTER, true);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void showLoading(boolean visible) {
+        if (!visible) {
+            viewLoadingText.setVisibility(View.GONE);
+            viewLoading.setVisibility(View.GONE);
+        } else {
+            viewLoading.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+
+
+}
