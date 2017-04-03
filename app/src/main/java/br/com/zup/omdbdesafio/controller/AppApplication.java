@@ -6,6 +6,7 @@ import android.content.Context;
 
 import java.util.HashMap;
 
+import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.model.business.EnviromentManager;
 
 

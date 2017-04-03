@@ -13,7 +13,7 @@ public interface IAppBusinessLogic {
 	List<Filmes> getSearchList(String  item) throws SQLException;
 
 	void insertFilmes(Filmes research) throws SQLException, ObjectAlreadyExistException;
-
+	void deleteFilm(Filmes research) throws SQLException, ObjectAlreadyExistException;
 	void updateFilmes(Filmes filmes) throws SQLException;
 
 

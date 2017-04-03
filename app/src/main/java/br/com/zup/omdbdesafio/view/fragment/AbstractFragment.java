@@ -17,6 +17,7 @@ import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.controller.activity.AbstractFragmentActivity;
 import br.com.zup.omdbdesafio.controller.listener.IOmdbActivityListener;
 import br.com.zup.omdbdesafio.controller.listener.IBackPressListener;
+import butterknife.ButterKnife;
 
 public abstract class AbstractFragment extends Fragment {
 
@@ -38,6 +39,7 @@ public abstract class AbstractFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		ViewCompat.requestApplyInsets(view);
+		ButterKnife.bind(this,view);
 	}
 
 	@Override

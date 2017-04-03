@@ -3,6 +3,7 @@ package br.com.zup.omdbdesafio.model.business;
 import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
@@ -36,7 +37,7 @@ public class EnviromentManager implements IAppBusinessLogic {
     @Override
     public Filmes getSearch(Filmes filmes) throws SQLException {
         QueryBuilder<Filmes, Integer> queryBuilder = (QueryBuilder<Filmes, Integer>) sqLite.getDao(Filmes.class).queryBuilder();
-        queryBuilder.where().eq("id", filmes.getId());
+        queryBuilder.where().eq("imdbID",filmes.getImdbID());
         queryBuilder.limit(1);
         filmes = queryBuilder.queryForFirst();
         return filmes;
@@ -64,6 +65,14 @@ public class EnviromentManager implements IAppBusinessLogic {
     public void insertFilmes(Filmes research) throws SQLException, ObjectAlreadyExistException {
         Dao<Filmes, Long> dao = sqLite.getDao(Filmes.class);
         sqLite.getDao(Filmes.class).createOrUpdate(research);
+    }
+
+    @Override
+    public void deleteFilm(Filmes filmes) throws SQLException, ObjectAlreadyExistException {
+        Dao dao = sqLite.getDao(Filmes.class);
+        DeleteBuilder<Filmes, Integer> deleteBuilder = dao.deleteBuilder();
+        deleteBuilder.where().eq("imdbID",filmes.getImdbID());
+        deleteBuilder.delete();
     }
 
     @Override

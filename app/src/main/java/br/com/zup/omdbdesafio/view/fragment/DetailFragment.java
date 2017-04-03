@@ -4,13 +4,11 @@ package br.com.zup.omdbdesafio.view.fragment;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,21 +23,21 @@ import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-
 import java.io.File;
 import java.io.IOException;
 
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.controller.AppApplication;
-import br.com.zup.omdbdesafio.controller.activity.OmdbActivity;
 import br.com.zup.omdbdesafio.controller.component.ConnectionTestHandler;
 import br.com.zup.omdbdesafio.controller.component.ConnectionTestThread;
-
 import br.com.zup.omdbdesafio.controller.listener.IBackPressListener;
 import br.com.zup.omdbdesafio.controller.listener.IConnectionTestListener;
 import br.com.zup.omdbdesafio.controller.service.OmdbService;
 import br.com.zup.omdbdesafio.model.ModelBO;
 import br.com.zup.omdbdesafio.model.domain.Filmes;
+import br.com.zup.omdbdesafio.view.interfaces.DetailsFragmentImpl;
+import butterknife.BindView;
+import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,29 +45,45 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailFragment extends AbstractFragment implements IConnectionTestListener {
+public class DetailFragment extends AbstractFragment implements IConnectionTestListener, DetailsFragmentImpl {
 
-    private String API = "http://www.omdbapi.com";
-    private ImageView poster;
-    private TextView txtDirector;
-    private TextView txtactor;
-    private TextView txtType;
-    private TextView txtPlot;
-    private TextView txtWriter;
-    private TextView txtGenre;
-    private TextView txtYear;
-    private TextView txtTime;
-    private TextView txtCountry;
-    private TextView txtTotalSeasons;
-    private TextView txtReleased;
-    private TextView txtawards;
+    private static final String TAG = DetailFragment.class.getSimpleName();
+    @BindView(R.id.backdrop)
+    ImageView poster;
+    @BindView(R.id.txt_director)
+    TextView txtDirector;
+    @BindView(R.id.txt_actors)
+    TextView txtactor;
+    @BindView(R.id.txt_type)
+    TextView txtType;
+    @BindView(R.id.txt_plot)
+    TextView txtPlot;
+    @BindView(R.id.txt_writer)
+    TextView txtWriter;
+    @BindView(R.id.txt_genre)
+    TextView txtGenre;
+    @BindView(R.id.txt_year)
+    TextView txtYear;
+    @BindView(R.id.txt_time)
+    TextView txtTime;
+    @BindView(R.id.txt_country)
+    TextView txtCountry;
+    @BindView(R.id.txt_seasor)
+    TextView txtTotalSeasons;
+    @BindView(R.id.txt_released)
+    TextView txtReleased;
+    @BindView(R.id.txt_awards)
+    TextView txtawards;
+    @BindView(R.id.floating_add)
+    FloatingActionButton floatingAdd;
 
     private BroadcastReceiver mDLCompleteReceiver;
 
-
     private Filmes filmes;
+    private Filmes filmAdd;
     private String url;
     private String path;
+    private boolean isFilmAdd;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,24 +96,19 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
         return rootView;
     }
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         filmes = ModelBO.getInstance().getFilmeSelection();
-        Log.i("Main Detail: ",getClass().getName()+" : "+filmes.getTitle());
-
         initActionBarScreen();
         initView();
 
-        if(filmes != null){
+        if (filmes != null) {
             inputData(filmes);
-
         }
 
     }
-
 
     private void initActionBarScreen() {
 
@@ -115,19 +124,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     }
 
     private void initView() {
-        poster = (ImageView) findViewById(R.id.backdrop);
-        txtDirector = (TextView) findViewById(R.id.txt_director);
-        txtactor    = (TextView) findViewById(R.id.txt_actors);
-        txtGenre    = (TextView) findViewById(R.id.txt_genre);
-        txtPlot     = (TextView) findViewById(R.id.txt_plot);
-        txtType     = (TextView) findViewById(R.id.txt_type);
-        txtWriter   = (TextView) findViewById(R.id.txt_writer);
-        txtYear     = (TextView) findViewById(R.id.txt_year);
-        txtTime     = (TextView) findViewById(R.id.txt_time);
-        txtCountry  = (TextView) findViewById(R.id.txt_country);
-        txtTotalSeasons = (TextView) findViewById(R.id.txt_seasor);
-        txtReleased = (TextView) findViewById(R.id.txt_released);
-        txtawards   = (TextView) findViewById(R.id.txt_awards);
+
 
     }
 
@@ -146,13 +143,13 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     public void downloadRepositories(final Filmes filmes) {
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API)
+                .baseUrl(AppApplication.getInstance().getContext().getResources().getString(R.string.url_search_film))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         OmdbService git = retrofit.create(OmdbService.class);
 
-        Call<Filmes> call = git.getOmdb(filmes.getTitle().toString().trim(), "sort", "json");
+        Call<Filmes> call = git.getDetailOmdb(filmes.getImdbID(), "json");
         call.enqueue(new Callback<Filmes>() {
             @Override
             public void onResponse(Call<Filmes> call, Response<Filmes> response) {
@@ -171,7 +168,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
                         Toast.makeText(getContext(), "responseBody = " + responseBody, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    if (sucessJSON.getResponse() != null && sucessJSON.getResponse().equalsIgnoreCase("True")){
+                    if (sucessJSON.getResponse() != null && sucessJSON.getResponse().equalsIgnoreCase("True")) {
                         Filmes item = new Filmes();
                         item.setId(filmes.getId());
                         item.setTitle(filmes.getTitle());
@@ -193,8 +190,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
                         item.setType(sucessJSON.getType());
                         item.setTotalSeasons(sucessJSON.getTotalSeasons());
 
-
-                        ModelBO.getInstance().addFilmes(item);
+                        filmAdd = item;
 
                         txtDirector.setText(sucessJSON.getDirector());
                         txtactor.setText(sucessJSON.getActors());
@@ -209,7 +205,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
                         txtCountry.setText(sucessJSON.getCountry());
                         txtawards.setText(sucessJSON.getAwards());
 
-                        downloadFile(item);
+//                        downloadFile(item);
 
                         url = sucessJSON.getPoster();
 
@@ -221,8 +217,8 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
 
                         Log.i("desafio", "desafio.onSuccess - " + String.valueOf(sucessJSON.getImdbID()));
-                    }else{
-                        Toast.makeText(getContext(), "Filme "+filmes.getTitle()+" não encontrado.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Filme " + filmes.getTitle() + " não encontrado.", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -240,41 +236,45 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
-                ((OmdbActivity) getActivity()).showMainScreen();
+                if (getActivity() != null) {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void inputData(Filmes filmes){
+    public void inputData(Filmes filmes) {
 
-        Filmes f = ModelBO.getInstance().getSearch(filmes);
-        if(f != null && f.getImdbID() != null) {
-            txtDirector.setText(f.getDirector());
-            txtactor.setText(f.getActors());
-            txtPlot.setText(f.getPlot());
-            txtWriter.setText(f.getWriter());
-            txtGenre.setText(f.getGenre());
-            txtYear.setText(f.getYear());
-            txtType.setText(f.getType());
-            txtTime.setText(f.getRuntime());
-            txtTime.setText(f.getRuntime());
-            txtReleased.setText(f.getReleased());
-            txtTotalSeasons.setText(f.getTotalSeasons());
-            txtCountry.setText(f.getCountry());
-            txtawards.setText(f.getAwards());
+        Filmes film = ModelBO.getInstance().getSearch(filmes);
+        if (film != null && film.getImdbID() != null) {
+            txtDirector.setText(film.getDirector());
+            txtactor.setText(film.getActors());
+            txtPlot.setText(film.getPlot());
+            txtWriter.setText(film.getWriter());
+            txtGenre.setText(film.getGenre());
+            txtYear.setText(film.getYear());
+            txtType.setText(film.getType());
+            txtTime.setText(film.getRuntime());
+            txtTime.setText(film.getRuntime());
+            txtReleased.setText(film.getReleased());
+            txtTotalSeasons.setText(film.getTotalSeasons());
+            txtCountry.setText(film.getCountry());
+            txtawards.setText(film.getAwards());
 
-            url = f.getPoster();
-            Log.i("path","Url: "+url);
+            url = film.getPoster();
+            Log.i("path", "Url: " + url);
             Picasso.with(getContext())
                     .load(url)
                     .into(poster);
 
-        }else {
-
+            floatingAdd.setImageResource(R.drawable.ic_delete);
+            filmAdd = film;
+            isFilmAdd = true;
+        } else {
+            floatingAdd.setImageResource(R.drawable.ic_done);
             connectionTest();
         }
     }
@@ -314,7 +314,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
             downloadRepositories(filmes);
         } else {
             dismissProgress();
-            Toast.makeText(getContext(),R.string.error_connection,Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.error_connection, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -328,9 +328,9 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
         final DownloadManager mgr = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
 
-        if(filmes.getPoster() != null && !filmes.getPoster().toString().equalsIgnoreCase("N/A")){
+        if (filmes.getPoster() != null && !filmes.getPoster().toString().equalsIgnoreCase("N/A")) {
 
-            String ur = filmes.getTitle().toString().trim().replace(" ","_");
+            String ur = filmes.getTitle().toString().trim().replace(" ", "_");
 
             Uri downloadUri = Uri.parse(filmes.getPoster());
             DownloadManager.Request request = new DownloadManager.Request(
@@ -339,16 +339,14 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
             request.setAllowedNetworkTypes(
                     DownloadManager.Request.NETWORK_WIFI
                             | DownloadManager.Request.NETWORK_MOBILE)
-                    .setDestinationInExternalPublicDir("/Omdb", ur+".jpg");
+                    .setDestinationInExternalPublicDir("/Omdb", ur + ".jpg");
 
             mgr.enqueue(request);
 
-            path = "file://"+direct+"/"+ur+".jpg";
+            path = "file://" + direct + "/" + ur + ".jpg";
             File file = new File(path);
 
-            Log.i("/","path: "+file.getPath());
-
-
+            Log.i("/", "path: " + file.getPath());
 
             Filmes update = new Filmes();
             update.setId(filmes.getId());
@@ -356,9 +354,44 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
             ModelBO.getInstance().updateFilmesUrl(update);
 
-        }else{
-            Toast.makeText(AppApplication.getInstance().getContext(),"Imagem não encontrada: "+filmes.getPoster(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(AppApplication.getInstance().getContext(), "Imagem não encontrada: " + filmes.getPoster(), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void saveFilme() {
+        ModelBO.getInstance().addFilmes(filmAdd, this);
+        downloadFile(filmAdd);
+    }
+
+    public void deleteFilm(){
+        ModelBO.getInstance().deleteFilmSelected(filmAdd, this);
+    }
+
+    @OnClick(R.id.floating_add)
+    public void onClickSave() {
+        if(!isFilmAdd) {
+            saveFilme();
+        }else{
+            deleteFilm();
+        }
+    }
+
+    @Override
+    public void onSuccessoAdd(String msg) {
+        isFilmAdd = true;
+        Toast.makeText(getActivity(),msg,Toast.LENGTH_SHORT).show();
+        floatingAdd.setImageResource(R.drawable.ic_delete);
+    }
+
+    @Override
+    public void onSuccessoDelete(String msg) {
+        getActivity().onBackPressed();
+    }
+
+    @Override
+    public void onError(String msg) {
+        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 }
