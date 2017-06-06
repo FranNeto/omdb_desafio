@@ -15,7 +15,7 @@ import java.util.List;
 
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.model.domain.SearchFilms;
-import br.com.zup.omdbdesafio.view.fragment.RegisterFragment;
+import br.com.zup.omdbdesafio.view.fragment.SearchViewFilmsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -25,9 +25,9 @@ public class SearchViewFilmsAdapter extends RecyclerView.Adapter<SearchViewFilms
     private List<SearchFilms.Search> mList;
     private LayoutInflater mLayoutInflater;
     private Context activity;
-    private RegisterFragment fragment;
+    private SearchViewFilmsFragment fragment;
 
-    public SearchViewFilmsAdapter(Context activity, List<SearchFilms.Search> mList, RegisterFragment fragment) {
+    public SearchViewFilmsAdapter(Context activity, List<SearchFilms.Search> mList, SearchViewFilmsFragment fragment) {
         this.activity = activity;
         this.mList    = mList;
         this.activity = activity;

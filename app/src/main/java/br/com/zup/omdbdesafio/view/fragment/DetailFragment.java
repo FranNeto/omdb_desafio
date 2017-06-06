@@ -1,6 +1,7 @@
 package br.com.zup.omdbdesafio.view.fragment;
 
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,7 +25,6 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
 
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.controller.AppApplication;
@@ -32,20 +32,16 @@ import br.com.zup.omdbdesafio.controller.component.ConnectionTestHandler;
 import br.com.zup.omdbdesafio.controller.component.ConnectionTestThread;
 import br.com.zup.omdbdesafio.controller.listener.IBackPressListener;
 import br.com.zup.omdbdesafio.controller.listener.IConnectionTestListener;
-import br.com.zup.omdbdesafio.controller.service.OmdbService;
+import br.com.zup.omdbdesafio.controller.permission.Permissions;
 import br.com.zup.omdbdesafio.model.ModelBO;
 import br.com.zup.omdbdesafio.model.domain.Filmes;
+import br.com.zup.omdbdesafio.presenter.DetailPresenter;
 import br.com.zup.omdbdesafio.view.interfaces.DetailsFragmentImpl;
+import br.com.zup.omdbdesafio.view.interfaces.ShowPermissions;
 import butterknife.BindView;
 import butterknife.OnClick;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailFragment extends AbstractFragment implements IConnectionTestListener, DetailsFragmentImpl {
+public class DetailFragment extends AbstractFragment implements IConnectionTestListener, DetailsFragmentImpl, ShowPermissions {
 
     private static final String TAG = DetailFragment.class.getSimpleName();
     @BindView(R.id.backdrop)
@@ -77,13 +73,12 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     @BindView(R.id.floating_add)
     FloatingActionButton floatingAdd;
 
-    private BroadcastReceiver mDLCompleteReceiver;
-
     private Filmes filmes;
     private Filmes filmAdd;
-    private String url;
     private String path;
-    private boolean isFilmAdd;
+    private boolean isFilmAdd = false;
+    private DetailPresenter presenter;
+    private final static String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -100,13 +95,11 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        presenter = new DetailPresenter();
         filmes = ModelBO.getInstance().getFilmeSelection();
         initActionBarScreen();
-        initView();
 
-        if (filmes != null) {
-            inputData(filmes);
-        }
+        inputData(filmes);
 
     }
 
@@ -123,11 +116,6 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
     }
 
-    private void initView() {
-
-
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -138,100 +126,6 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     public void onPause() {
         super.onPause();
 
-    }
-
-    public void downloadRepositories(final Filmes filmes) {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(AppApplication.getInstance().getContext().getResources().getString(R.string.url_search_film))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        OmdbService git = retrofit.create(OmdbService.class);
-
-        Call<Filmes> call = git.getDetailOmdb(filmes.getImdbID(), "json");
-        call.enqueue(new Callback<Filmes>() {
-            @Override
-            public void onResponse(Call<Filmes> call, Response<Filmes> response) {
-                Filmes sucessJSON = response.body();
-                if (sucessJSON == null) {
-
-                    ResponseBody responseBody = response.errorBody();
-                    if (responseBody != null) {
-                        Toast.makeText(getContext(), "responseBody:" + responseBody, Toast.LENGTH_SHORT).show();
-                        try {
-                            Toast.makeText(getContext(), "responseBody = " + responseBody.string(), Toast.LENGTH_SHORT).show();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "responseBody = " + responseBody, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    if (sucessJSON.getResponse() != null && sucessJSON.getResponse().equalsIgnoreCase("True")) {
-                        Filmes item = new Filmes();
-                        item.setId(filmes.getId());
-                        item.setTitle(filmes.getTitle());
-                        item.setActors(sucessJSON.getActors());
-                        item.setDirector(sucessJSON.getDirector());
-                        item.setGenre(sucessJSON.getGenre());
-                        item.setPlot(sucessJSON.getPlot());
-                        item.setAwards(sucessJSON.getAwards());
-                        item.setImdbID(sucessJSON.getImdbID());
-                        item.setRuntime(sucessJSON.getRuntime());
-                        item.setRated(sucessJSON.getRated());
-                        item.setReleased(sucessJSON.getReleased());
-                        item.setLanguage(sucessJSON.getLanguage());
-                        item.setCountry(sucessJSON.getCountry());
-                        item.setMetascore(sucessJSON.getMetascore());
-                        item.setWriter(sucessJSON.getWriter());
-                        item.setYear(sucessJSON.getYear());
-                        item.setPoster(sucessJSON.getPoster());
-                        item.setType(sucessJSON.getType());
-                        item.setTotalSeasons(sucessJSON.getTotalSeasons());
-
-                        filmAdd = item;
-
-                        txtDirector.setText(sucessJSON.getDirector());
-                        txtactor.setText(sucessJSON.getActors());
-                        txtPlot.setText(sucessJSON.getPlot());
-                        txtWriter.setText(sucessJSON.getWriter());
-                        txtGenre.setText(sucessJSON.getGenre());
-                        txtYear.setText(sucessJSON.getYear());
-                        txtType.setText(sucessJSON.getType());
-                        txtTime.setText(sucessJSON.getRuntime());
-                        txtReleased.setText(sucessJSON.getReleased());
-                        txtTotalSeasons.setText(sucessJSON.getTotalSeasons());
-                        txtCountry.setText(sucessJSON.getCountry());
-                        txtawards.setText(sucessJSON.getAwards());
-
-//                        downloadFile(item);
-
-                        url = sucessJSON.getPoster();
-
-                        Picasso.with(getContext())
-                                .load(sucessJSON.getPoster())
-                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
-                                .networkPolicy(NetworkPolicy.NO_CACHE)
-                                .into(poster);
-
-
-                        Log.i("desafio", "desafio.onSuccess - " + String.valueOf(sucessJSON.getImdbID()));
-                    } else {
-                        Toast.makeText(getContext(), "Filme " + filmes.getTitle() + " não encontrado.", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-                dismissProgress();
-            }
-
-            @Override
-            public void onFailure(Call<Filmes> call, Throwable t) {
-                //repositoryView.showProgressBar(View.GONE);
-                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-        });
     }
 
     @Override
@@ -264,10 +158,9 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
             txtCountry.setText(film.getCountry());
             txtawards.setText(film.getAwards());
 
-            url = film.getPoster();
-            Log.i("path", "Url: " + url);
+            Log.i("path", "Url: " + film.getPoster());
             Picasso.with(getContext())
-                    .load(url)
+                    .load(film.getPoster())
                     .into(poster);
 
             floatingAdd.setImageResource(R.drawable.ic_delete);
@@ -311,7 +204,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     @Override
     public void endConnectionTest(Boolean isSent) {
         if (isSent) {
-            downloadRepositories(filmes);
+            presenter.getDetailsFilm(filmes, this);
         } else {
             dismissProgress();
             Toast.makeText(getContext(), R.string.error_connection, Toast.LENGTH_LONG).show();
@@ -371,11 +264,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
     @OnClick(R.id.floating_add)
     public void onClickSave() {
-        if(!isFilmAdd) {
-            saveFilme();
-        }else{
-            deleteFilm();
-        }
+        Permissions.permissionsStorage(this, PERMISSIONS);
     }
 
     @Override
@@ -387,11 +276,56 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
     @Override
     public void onSuccessoDelete(String msg) {
-        getActivity().onBackPressed();
+        Toast.makeText(getActivity(),msg,Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().popBackStack();
+        }
     }
 
     @Override
     public void onError(String msg) {
+        dismissProgress();
         Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccessDetails(Filmes filmes) {
+        filmAdd = filmes;
+
+        txtDirector.setText(filmes.getDirector());
+        txtactor.setText(filmes.getActors());
+        txtPlot.setText(filmes.getPlot());
+        txtWriter.setText(filmes.getWriter());
+        txtGenre.setText(filmes.getGenre());
+        txtYear.setText(filmes.getYear());
+        txtType.setText(filmes.getType());
+        txtTime.setText(filmes.getRuntime());
+        txtReleased.setText(filmes.getReleased());
+        txtTotalSeasons.setText(filmes.getTotalSeasons());
+        txtCountry.setText(filmes.getCountry());
+        txtawards.setText(filmes.getAwards());
+
+        Picasso.with(getContext())
+                .load(filmes.getPoster())
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(poster);
+
+        dismissProgress();
+
+    }
+
+    @Override
+    public void showPermissionGranted(String permission) {
+        if(!isFilmAdd) {
+            saveFilme();
+        }else{
+            deleteFilm();
+        }
+    }
+
+    @Override
+    public void showPermissionDenied(String permission, boolean isPermanentlyDenied) {
+
     }
 }

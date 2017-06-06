@@ -4,6 +4,8 @@ package br.com.zup.omdbdesafio.controller;
 import android.app.Application;
 import android.content.Context;
 
+import com.karumi.dexter.Dexter;
+
 import java.util.HashMap;
 
 import br.com.zup.omdbdesafio.R;
@@ -30,6 +32,7 @@ public class AppApplication extends Application {
 		am.startSession( getApplicationContext() );
 		put(EnviromentManager.KEY, am);
 		singleton = this;
+		Dexter.initialize(getApplicationContext());
 
 	}
 

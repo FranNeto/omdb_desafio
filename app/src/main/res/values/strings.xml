@@ -11,13 +11,14 @@
     <string name="txt_type">Tipo :</string>
     <string name="txt_time">Duração :</string>
     <string name="error_connection">Sem acesso à internet</string>
-    <string name="txt_title_regsiter">Registrar Filme</string>
+    <string name="txt_title_search">Buscar Filme</string>
     <string name="txt_awards">Prêmios :</string>
     <string name="txt_released">Liberado :</string>
     <string name="txt_country">País :</string>
     <string name="txt_seasor">Seasor :</string>
     <string name="url_search_film">http://www.omdbapi.com</string>
     <string name="msg_delete">Deseja relamente deletar o filme</string>
+    <string name="apiKey">ae6969ba</string>
 
     <item type="id" name="tag_image_worker"></item>
     <item type="id" name="tag_second"></item>

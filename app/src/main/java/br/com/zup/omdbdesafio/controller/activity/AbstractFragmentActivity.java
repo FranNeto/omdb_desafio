@@ -181,9 +181,9 @@ public abstract class AbstractFragmentActivity extends AppCompatActivity impleme
         if (iBackPressListener != null) {
             iBackPressListener.onBackPress();
 
-            if (iBackPressListener != null && iBackPressListener.isFirstBack()) {
+//            if (iBackPressListener !=ç null && iBackPressListener.isFirstBack()) {
                 super.onBackPressed();
-            }
+//            }
 
         } else {
             super.onBackPressed();

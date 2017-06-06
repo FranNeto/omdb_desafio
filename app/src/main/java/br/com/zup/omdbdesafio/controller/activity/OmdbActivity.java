@@ -7,9 +7,6 @@ import android.widget.TextView;
 
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.view.Frags;
-import br.com.zup.omdbdesafio.view.fragment.DetailFragment;
-import br.com.zup.omdbdesafio.view.fragment.MainFragment;
-import br.com.zup.omdbdesafio.view.fragment.RegisterFragment;
 
 
 public class OmdbActivity extends AbstractFragmentActivity {
@@ -38,7 +35,7 @@ public class OmdbActivity extends AbstractFragmentActivity {
 
     @Override
     public void showDetail() {
-        DetailFragment fragment = (DetailFragment) registerFragment(Frags.DETAIL);
+        registerFragment(Frags.DETAIL);
         replaceFragment(Frags.DETAIL,true);
     }
 
@@ -47,13 +44,13 @@ public class OmdbActivity extends AbstractFragmentActivity {
         if (fragMan.getBackStackEntryCount() > 0) {
             popBackStackStart();
         }
-        MainFragment fragment = (MainFragment) registerFragment(Frags.MAIN);
+        registerFragment(Frags.MAIN);
         replaceFragment(Frags.MAIN, false);
     }
 
     @Override
     public void showRegister() {
-        RegisterFragment fragment = (RegisterFragment) registerFragment(Frags.REGISTER);
+        registerFragment(Frags.REGISTER);
         replaceFragment(Frags.REGISTER, true);
     }
 
@@ -78,7 +75,8 @@ public class OmdbActivity extends AbstractFragmentActivity {
         }
     }
 
-
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

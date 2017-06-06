@@ -7,6 +7,7 @@ import java.util.List;
 
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.controller.AppApplication;
+import br.com.zup.omdbdesafio.controller.service.ApiConnect;
 import br.com.zup.omdbdesafio.controller.service.OmdbService;
 import br.com.zup.omdbdesafio.model.ModelBO;
 import br.com.zup.omdbdesafio.model.domain.SearchFilms;
@@ -29,14 +30,8 @@ public class SearchViewFilmsPresenter {
     public void downloadRepositories(final String searchFilm, final SearchViewFilmsImpl listener) {
         this.listener = listener;
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(AppApplication.getInstance().getContext().getResources().getString(R.string.url_search_film))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        OmdbService git = retrofit.create(OmdbService.class);
-
-        Call<SearchFilms> call = git.getSearchOmdb(searchFilm, "json");
+        Call<SearchFilms> call = ApiConnect.restrofitConnect().getSearchOmdb(searchFilm, "json",AppApplication.getInstance().getContext().getResources().getString(R.string.apiKey));
+        Log.i(TAG," url call : "+call.request());
         call.enqueue(new Callback<SearchFilms>() {
             @Override
             public void onResponse(Call<SearchFilms> call, Response<SearchFilms> response) {
@@ -57,13 +52,13 @@ public class SearchViewFilmsPresenter {
 
                         for(SearchFilms.Search search: sucessJSON.getSearch() ){
                             SearchFilms.Search  searchFilms = new SearchFilms.Search();
-                            search.setTitle(search.getTitle());
-                            search.setYear(search.getYear());
-                            search.setImdbID(search.getImdbID());
-                            search.setPoster(search.getPoster());
-                            search.setType(search.getType());
+                            searchFilms.setTitle(search.getTitle());
+                            searchFilms.setYear(search.getYear());
+                            searchFilms.setImdbID(search.getImdbID());
+                            searchFilms.setPoster(search.getPoster());
+                            searchFilms.setType(search.getType());
 
-                            searchList.add(search);
+                            searchList.add(searchFilms);
 
                             ModelBO.getInstance().setSearchFilmsList(searchList);
                             Log.i(TAG," sucessJSON: Search"+search.getTitle());

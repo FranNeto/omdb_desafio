@@ -37,9 +37,9 @@ import br.com.zup.omdbdesafio.view.adapter.SearchViewFilmsAdapter;
 import br.com.zup.omdbdesafio.view.interfaces.SearchViewFilmsImpl;
 import butterknife.BindView;
 
-public class RegisterFragment extends AbstractFragment implements IConnectionTestListener, SearchViewFilmsImpl {
+public class SearchViewFilmsFragment extends AbstractFragment implements IConnectionTestListener, SearchViewFilmsImpl {
 
-    private static final String TAG = RegisterFragment.class.getSimpleName();
+    private static final String TAG = SearchViewFilmsFragment.class.getSimpleName();
 
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
@@ -87,7 +87,7 @@ public class RegisterFragment extends AbstractFragment implements IConnectionTes
     private void initActionBarScreen() {
         final AppCompatActivity activity = initActionBar();
         if (toolbar != null) {
-            toolbar.setTitle(getString(R.string.txt_title_regsiter));
+            toolbar.setTitle(getString(R.string.txt_title_search));
         }
 
         setHasOptionsMenu(true);

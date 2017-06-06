@@ -97,6 +97,8 @@ public class MainFragment extends AbstractFragment{
             mRecyclerView.setAdapter(adapter);
         }
 
+        ModelBO.getInstance().setSearchFilmsList(null);
+
     }
 
     public void showDetailFilme(Filmes filmes){

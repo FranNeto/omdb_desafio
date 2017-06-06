@@ -5,14 +5,14 @@ import java.io.Serializable;
 import br.com.zup.omdbdesafio.view.fragment.AbstractFragment;
 import br.com.zup.omdbdesafio.view.fragment.DetailFragment;
 import br.com.zup.omdbdesafio.view.fragment.MainFragment;
-import br.com.zup.omdbdesafio.view.fragment.RegisterFragment;
+import br.com.zup.omdbdesafio.view.fragment.SearchViewFilmsFragment;
 
 
 public enum Frags implements Serializable {
 
 
 	MAIN  (MainFragment.class),
-	REGISTER(RegisterFragment.class),
+	REGISTER(SearchViewFilmsFragment.class),
 	DETAIL(DetailFragment.class);
 
 	private final Class<? extends AbstractFragment> classFrag;
