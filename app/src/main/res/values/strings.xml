@@ -18,7 +18,7 @@
     <string name="txt_seasor">Seasor :</string>
     <string name="url_search_film">http://www.omdbapi.com</string>
     <string name="msg_delete">Deseja relamente deletar o filme</string>
-    <string name="apiKey">4c841ba5</string>
+    <string name="apiKey">APIKEY</string>
 
     <item type="id" name="tag_image_worker"></item>
     <item type="id" name="tag_second"></item>
