@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,7 +94,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        presenter = new DetailPresenter();
+        presenter = new DetailPresenter(this);
         filmes = ModelBO.getInstance().getFilmeSelection();
         initActionBarScreen();
 
@@ -113,18 +112,6 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(filmes.getTitle());
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
 
     }
 
@@ -158,7 +145,6 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
             txtCountry.setText(film.getCountry());
             txtawards.setText(film.getAwards());
 
-            Log.i("path", "Url: " + film.getPoster());
             Picasso.with(getContext())
                     .load(film.getPoster())
                     .into(poster);
@@ -204,7 +190,7 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
     @Override
     public void endConnectionTest(Boolean isSent) {
         if (isSent) {
-            presenter.getDetailsFilm(filmes, this);
+            presenter.getDetailsFilm(filmes);
         } else {
             dismissProgress();
             Toast.makeText(getContext(), R.string.error_connection, Toast.LENGTH_LONG).show();
@@ -238,8 +224,6 @@ public class DetailFragment extends AbstractFragment implements IConnectionTestL
 
             path = "file://" + direct + "/" + ur + ".jpg";
             File file = new File(path);
-
-            Log.i("/", "path: " + file.getPath());
 
             Filmes update = new Filmes();
             update.setId(filmes.getId());

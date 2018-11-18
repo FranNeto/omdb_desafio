@@ -27,8 +27,11 @@ public class SearchViewFilmsPresenter {
     private static final String TAG = SearchViewFilmsPresenter.class.getSimpleName();
     private SearchViewFilmsImpl listener;
 
-    public void downloadRepositories(final String searchFilm, final SearchViewFilmsImpl listener) {
+    public SearchViewFilmsPresenter(SearchViewFilmsImpl listener){
         this.listener = listener;
+    }
+
+    public void downloadRepositories(final String searchFilm) {
 
         Call<SearchFilms> call = ApiConnect.restrofitConnect().getSearchOmdb(searchFilm, "json",AppApplication.getInstance().getContext().getResources().getString(R.string.apiKey));
         Log.i(TAG," url call : "+call.request());

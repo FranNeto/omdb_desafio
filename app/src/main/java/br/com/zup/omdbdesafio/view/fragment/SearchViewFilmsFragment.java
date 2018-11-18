@@ -65,7 +65,7 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mPresenter = new SearchViewFilmsPresenter();
+        mPresenter = new SearchViewFilmsPresenter(this);
         initActionBarScreen();
         initView();
     }
@@ -81,7 +81,6 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(adapter);
         }
-
     }
 
     private void initActionBarScreen() {
@@ -120,7 +119,6 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.i(TAG, "Search onQueryTextSubmit: " + query.toString().trim());
                 mQuery = query.toString().trim();
                 connectionTest();
                 return false;
@@ -144,7 +142,6 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
                     hideKeyboard();
                 }
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -161,13 +158,8 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
     }
 
     private void hideKeyboard() {
-        if (getActivity() != null) {
-            View view = getActivity().getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }
+        InputMethodManager imm = (InputMethodManager) rootView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(rootView.getWindowToken(), 0);
     }
 
 
@@ -179,12 +171,11 @@ public class SearchViewFilmsFragment extends AbstractFragment implements IConnec
     @Override
     public void endConnectionTest(Boolean isSent) {
         if (isSent) {
-            mPresenter.downloadRepositories(mQuery, this);
+            mPresenter.downloadRepositories(mQuery);
         } else {
             dismissProgress();
             Toast.makeText(getContext(), R.string.error_connection, Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void showProgress() {

@@ -59,21 +59,18 @@ public abstract class AbstractFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-
 	}
 
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
-
 	}
 
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
 	}
 
 	/**
@@ -125,6 +122,4 @@ public abstract class AbstractFragment extends Fragment {
 
 		return objRet;
 	}
-
-
 }

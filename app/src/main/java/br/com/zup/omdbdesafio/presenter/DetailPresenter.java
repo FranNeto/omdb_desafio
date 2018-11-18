@@ -1,14 +1,10 @@
 package br.com.zup.omdbdesafio.presenter;
 
-
-import java.io.IOException;
-
 import br.com.zup.omdbdesafio.R;
 import br.com.zup.omdbdesafio.controller.AppApplication;
 import br.com.zup.omdbdesafio.controller.service.ApiConnect;
 import br.com.zup.omdbdesafio.model.domain.Filmes;
 import br.com.zup.omdbdesafio.view.interfaces.DetailsFragmentImpl;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,19 +15,22 @@ import retrofit2.Response;
  */
 
 public class DetailPresenter {
-    private static final String TAG = DetailPresenter.class.getSimpleName();
+
     private DetailsFragmentImpl listener;
 
-    public void getDetailsFilm(final Filmes filmes, final DetailsFragmentImpl listener) {
+    public DetailPresenter(DetailsFragmentImpl listener) {
         this.listener = listener;
+    }
 
-        Call<Filmes> call = ApiConnect.restrofitConnect().getDetailOmdb(filmes.getImdbID(), "json",AppApplication.getInstance().getContext().getResources().getString(R.string.apiKey));
+    public void getDetailsFilm(final Filmes filmes) {
+
+        Call<Filmes> call = ApiConnect.restrofitConnect().getDetailOmdb(filmes.getImdbID(), "json", AppApplication.getInstance().getContext().getResources().getString(R.string.apiKey));
         call.enqueue(new Callback<Filmes>() {
             @Override
             public void onResponse(Call<Filmes> call, Response<Filmes> response) {
                 Filmes sucessJSON = response.body();
                 if (sucessJSON == null) {
-                    listener.onError("Detalhe do filme não encontrado");
+                    listener.onError("Detalhes do filme não encontrado");
                 } else {
                     if (sucessJSON.getResponse() != null && sucessJSON.getResponse().equalsIgnoreCase("True")) {
                         Filmes item = new Filmes();
